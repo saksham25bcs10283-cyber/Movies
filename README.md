@@ -2,6 +2,14 @@
 
 > **Tagline:** *The film doesn't end at the credits.*
 
+[![Live Website](https://img.shields.io/badge/Live%20Website-afterframe.onrender.com-00c7b7?style=for-the-badge&logo=render&logoColor=white)](https://afterframe.onrender.com)
+[![Demo Video](https://img.shields.io/badge/Project%20Demo%20Video-Google%20Drive-E50914?style=for-the-badge&logo=googleplay&logoColor=white)](https://drive.google.com/file/d/1Oc43-OLu_oed7R4WrMEONFG02Z7jYxId/view?usp=drivesdk)
+
+- 🌐 **Live Website:** [https://afterframe.onrender.com](https://afterframe.onrender.com)
+- 🎬 **Project Demo Video:** [Watch Walkthrough on Google Drive](https://drive.google.com/file/d/1Oc43-OLu_oed7R4WrMEONFG02Z7jYxId/view?usp=drivesdk)
+
+---
+
 AfterFrame is a full-stack cinephile platform combining movie and TV discovery, trending people with persistent community upvotes, regional popularity charts (Top 10 & Top 100), detailed film pages with half-star ratings and subratings, a personal cinema diary and watchlist, deterministic explainable recommendations, and "Gather" movie outings.
 
 ---
