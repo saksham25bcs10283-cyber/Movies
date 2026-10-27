@@ -8,7 +8,11 @@ let dbStatus = {
 };
 
 export const connectDB = async () => {
-  const uri = process.env.MONGODB_URI?.trim();
+  let uri = process.env.MONGODB_URI?.trim();
+  if (uri) {
+    // Strip accidental surrounding single or double quotes
+    uri = uri.replace(/^["']|["']$/g, '').trim();
+  }
 
   if (!uri || uri.includes('<username>') || uri.includes('<password>')) {
     dbStatus.uriConfigured = false;
@@ -23,10 +27,12 @@ export const connectDB = async () => {
 
   try {
     mongoose.set('strictQuery', false);
-    await mongoose.connect(uri, {
-      serverSelectionTimeoutMS: 5000,
-      connectTimeoutMS: 10000,
-    });
+    const connectOptions = {
+      serverSelectionTimeoutMS: 10000,
+      connectTimeoutMS: 15000,
+      tls: true,
+    };
+    await mongoose.connect(uri, connectOptions);
 
     dbStatus.connected = true;
     dbStatus.connecting = false;
