@@ -17,11 +17,20 @@ export default function ChartsPage() {
   const [loading, setLoading] = useState(true);
   const [chartSearch, setChartSearch] = useState('');
   const [selectedGenre, setSelectedGenre] = useState(searchParams.get('genre') || '');
+  const [selectedLanguage, setSelectedLanguage] = useState(searchParams.get('language') || '');
   const [selectedYear, setSelectedYear] = useState('');
+
+  // Keep state in sync if URL query params change
+  useEffect(() => {
+    const g = searchParams.get('genre') || '';
+    const l = searchParams.get('language') || '';
+    if (g !== selectedGenre) setSelectedGenre(g);
+    if (l !== selectedLanguage) setSelectedLanguage(l);
+  }, [searchParams]);
 
   useEffect(() => {
     fetchChartData();
-  }, [mediaType, chartType, page, region, selectedGenre, selectedYear]);
+  }, [mediaType, chartType, page, region, selectedGenre, selectedLanguage, selectedYear]);
 
   const fetchChartData = async () => {
     setLoading(true);
@@ -42,10 +51,18 @@ export default function ChartsPage() {
           setItems(ranked);
         }
       } else {
-        // Top 100 Rated
+        // Top 100 Rated or Filtered Discovery
         let url = `/api/tmdb/top-rated?mediaType=${mediaType}&page=${page}`;
-        if (selectedGenre) {
-          url = `/api/tmdb/discover?mediaType=${mediaType}&with_genres=${selectedGenre}&sort_by=vote_average.desc&vote_count.gte=300&page=${page}`;
+        if (selectedGenre || selectedLanguage) {
+          const params = new URLSearchParams({
+            mediaType,
+            sort_by: 'vote_average.desc',
+            'vote_count.gte': '50',
+            page: String(page)
+          });
+          if (selectedGenre) params.set('with_genres', selectedGenre);
+          if (selectedLanguage) params.set('with_original_language', selectedLanguage);
+          url = `/api/tmdb/discover?${params.toString()}`;
         }
         const res = await fetch(url);
         if (res.ok) {
@@ -185,6 +202,41 @@ export default function ChartsPage() {
           </div>
         </div>
       </div>
+
+      {/* Active Interest / Filter Pill */}
+      {(selectedGenre || selectedLanguage) && (
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem',
+          marginBottom: '1rem',
+          background: 'rgba(245, 197, 24, 0.08)',
+          border: '1px solid rgba(245, 197, 24, 0.25)',
+          padding: '0.5rem 1rem',
+          borderRadius: 'var(--radius-md)'
+        }}>
+          <span style={{ fontSize: '0.85rem', color: 'var(--accent-yellow)', fontWeight: '600' }}>
+            Active Filter: {selectedLanguage === 'hi' ? 'Hindi Cinema' : (selectedLanguage === 'te' ? 'Telugu Cinema' : (selectedGenre === '18' ? 'Drama' : (selectedGenre === '27' ? 'Horror' : (selectedGenre === '878' ? 'Sci-Fi' : (selectedGenre === '28' ? 'Action' : (selectedLanguage ? `${selectedLanguage.toUpperCase()} Cinema` : `Genre #${selectedGenre}`))))))}
+          </span>
+          <button
+            onClick={() => {
+              setSelectedGenre('');
+              setSelectedLanguage('');
+              setSearchParams({});
+            }}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: 'var(--text-muted)',
+              cursor: 'pointer',
+              fontSize: '0.8rem',
+              textDecoration: 'underline'
+            }}
+          >
+            Clear Filter
+          </button>
+        </div>
+      )}
 
       {/* Info notice about ranking basis */}
       <div style={{

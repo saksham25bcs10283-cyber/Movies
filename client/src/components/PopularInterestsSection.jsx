@@ -6,7 +6,7 @@ const INTERESTS = [
   { id: 'drama', name: 'Drama', genreId: 18, image: 'https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=600&q=80' },
   { id: 'horror', name: 'Horror', genreId: 27, image: 'https://images.unsplash.com/photo-1509248961158-e54f6934749c?auto=format&fit=crop&w=600&q=80' },
   { id: 'telugu', name: 'Telugu', lang: 'te', image: 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=600&q=80' },
-  { id: 'hindi', name: 'Hindi', lang: 'hi', image: 'https://images.unsplash.com/photo-1518676599649-7c858cc5c3b1?auto=format&fit=crop&w=600&q=80' },
+  { id: 'hindi', name: 'Hindi', lang: 'hi', image: 'https://images.unsplash.com/photo-1594909122845-11baa439b7bf?auto=format&fit=crop&w=600&q=80' },
   { id: 'sci-fi', name: 'Sci-Fi', genreId: 878, image: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=600&q=80' },
   { id: 'action', name: 'Action', genreId: 28, image: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=600&q=80' }
 ];
@@ -22,7 +22,11 @@ export default function PopularInterestsSection() {
     }
   };
 
-  const handleInterestClick = (interest) => {
+  const handleInterestClick = (interest, e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     if (interest.genreId) {
       navigate(`/charts?genre=${interest.genreId}`);
     } else if (interest.lang) {
@@ -35,7 +39,7 @@ export default function PopularInterestsSection() {
   return (
     <section style={{ maxWidth: '1380px', margin: '0 auto 3rem auto', padding: '0 1.25rem' }}>
       {/* Header matching screenshot 3 */}
-      <div className="section-header">
+      <div className="section-header" style={{ cursor: 'pointer' }} onClick={() => navigate('/charts')}>
         <div className="section-title-wrap">
           <div className="section-bar" />
           <h2 className="section-title">
@@ -59,14 +63,26 @@ export default function PopularInterestsSection() {
           {INTERESTS.map((interest) => (
             <div
               key={interest.id}
-              onClick={() => handleInterestClick(interest)}
+              onClick={(e) => handleInterestClick(interest, e)}
               className="interest-card"
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  handleInterestClick(interest, e);
+                }
+              }}
+              style={{ cursor: 'pointer' }}
             >
               <img
                 src={interest.image}
                 alt={interest.name}
                 className="interest-img"
                 loading="lazy"
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = 'https://images.unsplash.com/photo-1524712245354-2c4e5e7121c0?auto=format&fit=crop&w=600&q=80';
+                }}
               />
               <div className="interest-overlay">
                 <span className="interest-plus-btn">

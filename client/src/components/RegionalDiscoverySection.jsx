@@ -108,13 +108,17 @@ export default function RegionalDiscoverySection({ movies = [], label = '', load
           className="hide-scrollbar"
         >
           {movies.map((movie) => {
-            const inWatchlist = isInWatchlist(movie.id, 'movie');
+            const isTv = movie.media_type === 'tv' || Boolean(movie.first_air_date && !movie.release_date);
+            const mediaType = isTv ? 'tv' : 'movie';
+            const inWatchlist = isInWatchlist(movie.id, mediaType);
             const title = movie.title || movie.name;
-            const releaseYear = (movie.release_date || '').slice(0, 4);
+            const releaseYear = (movie.release_date || movie.first_air_date || '').slice(0, 4);
+            const detailPath = `/${mediaType}/${movie.id}`;
 
             return (
               <div
                 key={movie.id}
+                onClick={() => navigate(detailPath)}
                 style={{
                   flex: '0 0 190px',
                   scrollSnapAlign: 'start',
@@ -124,12 +128,19 @@ export default function RegionalDiscoverySection({ movies = [], label = '', load
                   overflow: 'hidden',
                   display: 'flex',
                   flexDirection: 'column',
+                  cursor: 'pointer',
                   transition: 'transform var(--transition-fast), border-color var(--transition-fast), box-shadow var(--transition-fast)'
                 }}
                 className="regional-movie-card"
               >
                 {/* Poster & Bookmark */}
-                <div style={{ position: 'relative', width: '100%', height: '270px', background: 'var(--bg-surface-elevated)' }}>
+                <div
+                  style={{ position: 'relative', width: '100%', height: '270px', background: 'var(--bg-surface-elevated)', cursor: 'pointer' }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(detailPath);
+                  }}
+                >
                   <ImageWithFallback
                     src={getPoster(movie.poster_path)}
                     alt={title}
@@ -140,7 +151,7 @@ export default function RegionalDiscoverySection({ movies = [], label = '', load
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      toggleWatchlist({ ...movie, mediaType: 'movie' });
+                      toggleWatchlist({ ...movie, mediaType });
                     }}
                     className={`watchlist-bookmark-btn ${inWatchlist ? 'active' : ''}`}
                     title={inWatchlist ? 'In your Watchlist' : 'Add to Watchlist'}
@@ -183,8 +194,11 @@ export default function RegionalDiscoverySection({ movies = [], label = '', load
                       )}
                     </div>
 
-                    <Link
-                      to={`/movie/${movie.id}`}
+                    <div
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(detailPath);
+                      }}
                       style={{
                         display: '-webkit-box',
                         WebkitLineClamp: 2,
@@ -195,16 +209,16 @@ export default function RegionalDiscoverySection({ movies = [], label = '', load
                         color: 'var(--text-primary)',
                         lineHeight: 1.3,
                         marginBottom: '0.45rem',
-                        textDecoration: 'none'
+                        cursor: 'pointer'
                       }}
                       title={title}
                     >
                       {title}
-                    </Link>
+                    </div>
                   </div>
 
-                  <div style={{ marginTop: '0.35rem' }}>
-                    <TasteMatchBadge mediaType="movie" tmdbId={movie.id} size="sm" />
+                  <div style={{ marginTop: '0.35rem' }} onClick={(e) => e.stopPropagation()}>
+                    <TasteMatchBadge mediaType={mediaType} tmdbId={movie.id} size="sm" />
                   </div>
                 </div>
               </div>

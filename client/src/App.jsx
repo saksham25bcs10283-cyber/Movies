@@ -26,16 +26,17 @@ import GatherPage from './pages/GatherPage';
 function RefreshToHomeHandler() {
   const navigate = useNavigate();
   const location = useLocation();
+  const hasCheckedRef = React.useRef(false);
 
   useEffect(() => {
+    if (hasCheckedRef.current) return;
+    hasCheckedRef.current = true;
+
     try {
       const navEntries = performance.getEntriesByType('navigation');
       const isReload =
         (navEntries && navEntries[0] && navEntries[0].type === 'reload') ||
-        (window.performance && window.performance.navigation && window.performance.navigation.type === 1) ||
-        sessionStorage.getItem('af_was_reloaded') === 'true';
-
-      sessionStorage.removeItem('af_was_reloaded');
+        (window.performance && window.performance.navigation && window.performance.navigation.type === 1);
 
       if (isReload && location.pathname !== '/') {
         navigate('/', { replace: true });
@@ -52,7 +53,17 @@ function RefreshToHomeHandler() {
     } catch {
       // Graceful fallback
     }
-  }, [navigate, location.pathname]);
+  }, []); // Run ONLY once on initial mount
+
+  return null;
+}
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [pathname]);
 
   return null;
 }
@@ -70,6 +81,7 @@ export default function App() {
             )}
             <BrowserRouter>
               <RefreshToHomeHandler />
+              <ScrollToTop />
               <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
                 <Header />
                 <div style={{ flex: 1 }}>

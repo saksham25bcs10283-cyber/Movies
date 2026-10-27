@@ -198,15 +198,17 @@ export default function ExploreStreamingSection({ movies: fallbackMovies = [] })
             )}
 
             {displayMovies.map((movie) => {
-              const inWatchlist = isInWatchlist(movie.id, movie.media_type || 'movie');
-              const isTv = movie.media_type === 'tv';
+              const isTv = movie.media_type === 'tv' || Boolean(movie.first_air_date && !movie.release_date);
+              const mediaType = isTv ? 'tv' : 'movie';
+              const inWatchlist = isInWatchlist(movie.id, mediaType);
               const title = movie.title || movie.name;
+              const detailPath = `/${mediaType}/${movie.id}`;
               const justWatchDestination = `https://www.justwatch.com/${region.toLowerCase()}/search?q=${encodeURIComponent(title)}`;
 
               return (
                 <div
                   key={movie.id}
-                  onClick={() => navigate(isTv ? `/tv/${movie.id}` : `/movie/${movie.id}`)}
+                  onClick={() => navigate(detailPath)}
                   style={{
                     flex: '0 0 200px',
                     background: 'var(--bg-card)',
@@ -227,7 +229,13 @@ export default function ExploreStreamingSection({ movies: fallbackMovies = [] })
                   }}
                 >
                   {/* Poster Wrap with Bookmark button stopping propagation */}
-                  <div style={{ position: 'relative', width: '100%', aspectRatio: '2/3', background: 'var(--bg-surface-elevated)' }}>
+                  <div
+                    style={{ position: 'relative', width: '100%', aspectRatio: '2/3', background: 'var(--bg-surface-elevated)', cursor: 'pointer' }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(detailPath);
+                    }}
+                  >
                     <ImageWithFallback
                       src={getPoster(movie.poster_path)}
                       alt={title}
@@ -237,7 +245,7 @@ export default function ExploreStreamingSection({ movies: fallbackMovies = [] })
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        toggleWatchlist(movie);
+                        toggleWatchlist({ ...movie, mediaType });
                       }}
                       className={`watchlist-bookmark-btn ${inWatchlist ? 'active' : ''}`}
                       title={inWatchlist ? 'In Watchlist' : 'Add to Watchlist'}
@@ -262,9 +270,14 @@ export default function ExploreStreamingSection({ movies: fallbackMovies = [] })
                         display: '-webkit-box',
                         WebkitLineClamp: 1,
                         WebkitBoxOrient: 'vertical',
-                        overflow: 'hidden'
+                        overflow: 'hidden',
+                        cursor: 'pointer'
                       }}
                       title={title}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigate(detailPath);
+                      }}
                     >
                       {title}
                     </div>
@@ -280,6 +293,7 @@ export default function ExploreStreamingSection({ movies: fallbackMovies = [] })
                         rel="noopener noreferrer"
                         className="btn-secondary"
                         title={`Watch ${title} on ${activeProvider?.name || 'Streaming'}`}
+                        onClick={(e) => e.stopPropagation()}
                         style={{
                           padding: '0.4rem 0.6rem',
                           fontSize: '0.78rem',
@@ -297,7 +311,10 @@ export default function ExploreStreamingSection({ movies: fallbackMovies = [] })
                       </a>
 
                       <button
-                        onClick={(e) => handleOpenTrailer(movie, e)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleOpenTrailer(movie, e);
+                        }}
                         style={{
                           display: 'flex',
                           alignItems: 'center',
