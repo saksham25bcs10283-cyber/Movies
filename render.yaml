@@ -3,7 +3,7 @@ services:
     name: afterframe
     runtime: node
     plan: free
-    buildCommand: npm install && npm run build
+    buildCommand: npm install && npm install --prefix server && npm install --prefix client && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
