@@ -44,3 +44,4 @@ pnpm-debug.log*
 *.sw?
 .system_generated/
 .gemini/
+AFTER-FRAME-/

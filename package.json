@@ -3,13 +3,17 @@
   "version": "1.0.0",
   "description": "AfterFrame — Premium MERN Movie Discovery & Community Application. The film doesn't end at the credits.",
   "scripts": {
-    "install:all": "npm install --prefix server && npm install --prefix client",
-    "dev:server": "npm run dev --prefix server",
+    "dev": "concurrently npm:dev:server npm:dev:client",
     "dev:client": "npm run dev --prefix client",
+    "dev:server": "npm run dev --prefix server",
+    "install:all": "npm install --prefix server && npm install --prefix client",
     "build": "npm run build --prefix client",
     "build:client": "npm run build --prefix client",
     "start": "node server/src/server.js",
     "test": "npm test --prefix server",
     "test:server": "npm test --prefix server"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.6"
   }
 }

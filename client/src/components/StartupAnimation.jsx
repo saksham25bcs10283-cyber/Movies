@@ -19,13 +19,17 @@ export default function StartupAnimation({ onComplete }) {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    // Check reduced motion preference
+    // Check if already seen in current browser session or if reduced motion is preferred
+    const hasSeenSplash = sessionStorage.getItem('af_splash_seen');
     const prefersReducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReducedMotion) {
+    if (hasSeenSplash === 'true' || prefersReducedMotion) {
       setVisible(false);
       if (onComplete) onComplete();
       return;
     }
+    try {
+      sessionStorage.setItem('af_splash_seen', 'true');
+    } catch {}
 
     // Stage 1 -> Stage 2: Symbol fades in, then Tagline appears at 750ms
     const timerStage2 = setTimeout(() => {
